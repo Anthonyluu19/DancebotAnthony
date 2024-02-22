@@ -49,9 +49,9 @@ String getJavascript();
 
 //Data transmission to clients
 uint8_t broadcastAddress[] = {0x30, 0x83, 0x98, 0xD9, 0x19, 0xCC}; // REPLACE WITH YOUR RECEIVER MAC Address
+struct_message message;  //message sent to clients
 
-struct_message message; //message sent to clients
-
+//enums that correspond to dance moves
 enum{
   STOP,
   RESET,
@@ -241,17 +241,6 @@ void handleDance() {
     dance_routine = "ERROR Server did not find dance routine argument in HTTP request";
     //strcpy(message.character, "Server arguement not found");
   }
-
-  //transmit message to clients
-  // esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &message, sizeof(message));
-  // if (result == ESP_OK) {
-  //   Serial.println("Sent with success");
-  // }
-  // else {
-  //   Serial.println("Error sending the data");
-  // }
-  //delay(1000);
-  
   server.send(200, "text/plain", dance_routine);
 }
 

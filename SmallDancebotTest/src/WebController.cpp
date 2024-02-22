@@ -55,6 +55,7 @@ typedef struct struct_message {
 struct_message message; 
 int rcvFlag;
 
+//enums correspond to each dance move
 enum{
   STOP,
   RESET,
@@ -99,9 +100,10 @@ void setupESPNOW(DancingServos* _dance_bot){
     return;
   }
   
-  // get recv packer info
+  //callback function: each time we receive a msg, we call handleReceivedDanceMovie()
   esp_now_register_recv_cb(handleReceivedDanceMove);
 
+  //pointer to dance_bot in current file points to _dance_bot in main
   dance_bot = _dance_bot; 
 }
 
@@ -115,13 +117,6 @@ void setupWiFi(String mode, const char * ssid, const char * pass) {
   server_pass = pass;
 
   WiFi.mode(WIFI_STA);
-  
-  // if (esp_now_init() != ESP_OK) {
-  //   Serial.println("Error initializing ESP-NOW");
-  //   return;
-  // }
-  
-  // esp_now_register_recv_cb(data_receive);
 
   if (mode.equals("AP")) {
     //Turn on Access Point
@@ -182,6 +177,7 @@ void handleRoot() {
   server.send(200, "text/html", indexHTML());
 }
 
+//when called, takes in received data from transmitter and sets flag (used for dance moves)
 void handleReceivedDanceMove(const uint8_t * mac, const uint8_t *incomingData, int len){
   memcpy(&message, incomingData, sizeof(message));
   Serial.println("Received message...");
@@ -194,47 +190,7 @@ void handleReceivedDanceMove(const uint8_t * mac, const uint8_t *incomingData, i
 
 //dance moves    "/danceM"
 void handleDanceMove() {
-  //hasArg() checks if the last HTTP request in the server has an argument
-  //arg() gets the value of the arg by name
-
-  //check for serial input form
-  // String dance_move = "";
-  // if(server.hasArg("dance_move")) {
-  //   dance_move = server.arg("dance_move");
-  //   Serial.println("Server received dance_move: " + dance_move);
-
-  //   if (dance_move == "Stop") {
-  //     dance_bot->stopOscillation();
-  //     dance_bot->enableDanceRoutine(false);
-  //   }
-  //   else if (dance_move == "Reset") {
-  //     dance_bot->position0();
-  //   }
-  //   else if (dance_move == "Walk") {
-  //     dance_bot->walk(-1, 1500, false);
-  //   }
-  //   else if (dance_move == "Hop") {
-  //     dance_bot->hop(25, -1);
-  //   }
-  //   else if (dance_move == "Wiggle") {
-  //     dance_bot->wiggle(30, -1);
-  //   }
-  //   else if (dance_move == "Ankles") {
-  //     dance_bot->themAnkles(-1);
-  //   }
-    
-  //   else {
-  //     Serial.println("Dance move not recognized, ERROR too lit for this robot");
-  //     handleUnknownMove();
-  //     return;
-  //   }
-  // }
-  // else {
-  //   dance_move = "ERROR Server did not find dance move argument in HTTP request";
-  // }
-
-  // //handleRoot();     //now the form is handled with JS so there is no need to respond with index html
-  // server.send(200, "text/plain", dance_move);
+  //if we have received a message, do corresponding dance move
   if(rcvFlag){
     if (message.integer == STOP) {
       dance_bot->stopOscillation();
